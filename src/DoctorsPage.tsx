@@ -171,7 +171,71 @@ export default function DoctorsPage() {
     <div className="pageWrap">
       <h2 className="pageTitle">Find a Doctor</h2>
 
-      {/* filters UI same as before ... */}
+      <div className="filters" role="region" aria-label="filters">
+        <div>
+          <label>Specialty</label>
+          <input
+            className="input"
+            value={specialty}
+            onChange={(e) => setSpecialty(e.target.value)}
+            placeholder="Dermatology"
+          />
+        </div>
+        <div>
+          <label>City</label>
+          <input
+            className="input"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="Bucharest"
+          />
+        </div>
+        <div>
+          <label>Min Price (RON)</label>
+          <input
+            className="input"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={minPrice}
+            onChange={(e) =>
+              setMinPrice(e.target.value === "" ? "" : Number(e.target.value))
+            }
+          />
+        </div>
+        <div>
+          <label>Max Price (RON)</label>
+          <input
+            className="input"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={maxPrice}
+            onChange={(e) =>
+              setMaxPrice(e.target.value === "" ? "" : Number(e.target.value))
+            }
+          />
+        </div>
+        <div>
+          <label>Sort</label>
+          <select
+            className="select"
+            value={sort}
+            onChange={(e) => setSort(e.target.value as any)}
+          >
+            <option value="relevance">Relevance</option>
+            <option value="rating">Rating</option>
+            <option value="priceAsc">Price ↑</option>
+            <option value="priceDesc">Price ↓</option>
+          </select>
+        </div>
+        <label className="checkboxRow">
+          <input
+            type="checkbox"
+            checked={onlyVerified}
+            onChange={(e) => setOnlyVerified(e.target.checked)}
+          />
+          Only verified
+        </label>
+      </div>
 
       {/* Booking status / feedback to the user */}
       <div className="toolbar" aria-live="polite">
