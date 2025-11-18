@@ -1,0 +1,38 @@
+[
+  {
+    "id": "9f61f900-23f8-11ee-be56-0242ac120002",
+    "fullName": "Dr. Ana Popescu",
+    "specialty": "Dermatology",
+    "city": "Bucharest",
+    "priceMinCents": 12000,
+    "priceMaxCents": 18000,
+    "verified": true,
+    "ratingAvg": 4.7,
+    "ratingCount": 42,
+    "nextSlots": ["2025-10-03T10:00:00Z", "2025-10-04T11:30:00Z"]
+  },
+  {
+    "id": "9f61fb40-23f8-11ee-be56-0242ac120002", 
+    "fullName": "Dr. Mihai Ionescu",
+    "specialty": "Cardiology",
+    "city": "Cluj-Napoca",
+    "priceMinCents": 20000,
+    "priceMaxCents": 26000,
+    "verified": false,
+    "ratingAvg": 4.3,
+    "ratingCount": 18,
+    "nextSlots": ["2025-10-05T08:00:00Z"]
+  },
+  {
+    "id": "9f61fc62-23f8-11ee-be56-0242ac120002",
+    "fullName": "Dr. Ioana Marinescu",
+    "specialty": "Pediatrics",
+    "city": "Iasi",
+    "priceMinCents": 9000,
+    "priceMaxCents": 14000,
+    "verified": true,
+    "ratingAvg": 4.9,
+    "ratingCount": 64,
+    "nextSlots": []
+  }
+]
