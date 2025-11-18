@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: docmarket-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-docuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-docpass}
+      POSTGRES_DB: ${POSTGRES_DB:-docmarket}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  adminer:
+    image: adminer:4
+    container_name: docmarket-adminer
+    restart: unless-stopped
+    ports:
+      - "8085:8080"
+    depends_on:
+      - db
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: docmarket-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-docmarket}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-docuser}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-docpass}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      APP_CORS_ORIGIN: ${APP_CORS_ORIGIN:-http://localhost:5173}
+      # Use only if you implement JWT cookies later:
+      APP_JWT_SECRET: ${APP_JWT_SECRET:-dev-please-change}
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  db_data:
