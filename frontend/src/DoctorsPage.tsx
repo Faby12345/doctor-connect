@@ -275,8 +275,8 @@ export default function DoctorsPage() {
             <DoctorCard
               key={r.id}
               d={r}
-              onView={(id) => navigate(`/doctor/${id}`)}
-              onBook={(id) => handleBook(r.id)}
+              onView={() => navigate(`/doctor/${r.id}`)}
+              onBook={() => handleBook(r.id)}
             />
           ))}
         </div>

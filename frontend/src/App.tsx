@@ -1,13 +1,14 @@
 // App.tsx
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 
 import LoginPage from "./login";
 import RegisterPage from "./register";
-import MainPage, { type User } from "./MainPage";
+import MainPage from "./MainPage";
 import DoctorsPage from "./DoctorsPage";
 import DoctorProfile from "./DoctorProfile/DoctorProfilePage";
 import Dock from "./components/Dock";
+import { useAuth } from "./AuthContext";
 import {
   VscHome,
   VscArchive,
@@ -15,14 +16,19 @@ import {
   VscSettingsGear,
 } from "react-icons/vsc";
 
+// If you want stricter typing for roles, you can import AuthUser and use it here.
+import type { AuthUser } from "./AuthContext";
+import DoctorProfile_outside from "./DoctorProfile/DoctorProfilePage_outside";
+import DoctorProfileRoute from "./DoctorProfile/DoctorProfileRoute";
+
 /** Guard a route by role */
 function RoleRoute({
   user,
   allow,
   children,
 }: {
-  user: User;
-  allow: Array<User["role"]>;
+  user: AuthUser; // ✅ align with context type
+  allow: Array<AuthUser["role"]>; // ✅ align with context type
   children: React.ReactElement;
 }) {
   if (!allow.includes(user.role))
@@ -33,9 +39,7 @@ function RoleRoute({
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
 
 export default function App() {
-  const [user, setUser] = useState<User | null>(null);
-  const [booting, setBooting] = useState(true);
-
+  const { user, setUser, loading } = useAuth(); // ✅ get setUser (+ loading) from context
   const navigate = useNavigate();
 
   const items = [
@@ -61,37 +65,17 @@ export default function App() {
     },
   ];
 
-  // Boot: check session
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/auth/me`, {
-          credentials: "include",
-        });
-        if (res.ok) {
-          const me = (await res.json()) as User;
-          if (me && (me.authenticated ?? true) && me.id) {
-            setUser(me);
-          }
-        }
-      } catch {
-        /* ignore */
-      } finally {
-        setBooting(false);
-      }
-    })();
-  }, []); // no need to depend on navigate
-
   async function handleLogout() {
     await fetch(`${API_URL}/api/auth/logout`, {
       method: "POST",
       credentials: "include",
     });
-    setUser(null);
+    setUser(null); // ✅ update via context
     navigate("/");
   }
 
-  if (booting) return <div style={{ padding: 24 }}>Loading…</div>;
+  // Optional: show a boot screen while context loads the session
+  if (loading) return <div style={{ padding: 24 }}>Loading…</div>;
 
   return (
     <>
@@ -106,7 +90,7 @@ export default function App() {
       )}
 
       <Routes>
-        {/* Public routes */}
+        {/* Public routes (when not logged in) */}
         {!user ? (
           <>
             <Route
@@ -121,6 +105,9 @@ export default function App() {
                       body: JSON.stringify(vals),
                     });
                     if (!res.ok) throw new Error(await res.text());
+                    // Optionally fetch /me or set returned user if API returns it
+                    // const me = await (await fetch(`${API_URL}/api/auth/me`, { credentials: "include" })).json();
+                    // setUser(me);
                     navigate("/");
                   }}
                   onNavigateToLogin={() => navigate("/")}
@@ -133,8 +120,7 @@ export default function App() {
                 <LoginPage
                   onNavigateToRegister={() => navigate("/register")}
                   onLoginSuccess={(u) => {
-                    setUser(u);
-                    // after login, doctors go to /doctors; others to /
+                    setUser(u); // ✅ update via context
                     if (u.role === "DOCTOR") navigate("/doctors");
                     else navigate("/");
                   }}
@@ -150,9 +136,7 @@ export default function App() {
               element={<MainPage user={user} onLogout={handleLogout} />}
             />
             <Route path="/doctors" element={<DoctorsPage />} />
-            {/* Doctor details (visible to any signed-in user) */}
-            <Route path="/doctor/:id" element={<DoctorProfile />} />
-            {/* Doctor's own profile restricted to DOCTOR */}
+            <Route path="/doctor/:id" element={<DoctorProfileRoute />} />
             <Route
               path="/me"
               element={

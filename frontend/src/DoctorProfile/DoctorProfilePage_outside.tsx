@@ -1,8 +1,6 @@
 import React, { use, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./DoctorsProfilePage.css";
-import { useAuth } from "../AuthContext";
-import AppointmentsDoctorView from "../AppointmentsDoctorView";
 
 export type DoctorMe = {
   id: string;
@@ -61,10 +59,10 @@ interface DoctorDTO {
   ratingCount: number;
 }
 
-export default function DoctorProfile() {
-  const { user, setUser } = useAuth();
+export default function DoctorProfile_outside({ id }: { id: string }) {
+  // const { user, setUser } = useAuth();
 
-  const id = user?.id;
+  //const id = user?.id;
   const [doctor, setDoctor] = useState<DoctorDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -192,8 +190,6 @@ export default function DoctorProfile() {
           </div>
         </div>
       </section>
-
-      <AppointmentsDoctorView />
     </div>
   );
 }
