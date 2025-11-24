@@ -1,21 +1,24 @@
 package app.doctor_connect_backend.doctor;
 
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-
-import app.doctor_connect_backend.doctor.Doctor;
+import java.util.Objects;
 
 @Service
 public class DoctorService {
-    private final doctorRepository doctorRepository;
-    public DoctorService(doctorRepository doctorRepository) {
+    private final DoctorRepository doctorRepository;
+
+    public DoctorService(DoctorRepository doctorRepository) {
         this.doctorRepository = doctorRepository;
     }
+
     public Doctor findByUser_id(UUID id) {
         return doctorRepository.findByUserId(id);
     }
+
     public List<DoctorDTO> findAll() {
         return doctorRepository.findAll().stream()
                 .map(d -> new DoctorDTO(
@@ -28,13 +31,12 @@ public class DoctorService {
                         d.getPriceMaxCents(),
                         d.isVerified(),
                         d.getRatingAvg(),
-                        d.getRatingCount()
-                ))
+                        d.getRatingCount()))
                 .toList();
 
     }
 
-    public Doctor save(Doctor doctor) {
-        return doctorRepository.save(doctor);
+    public @NonNull Doctor save(Doctor doctor) {
+        return Objects.requireNonNull(doctorRepository.save(doctor));
     }
 }

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.lang.NonNull;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -22,6 +23,7 @@ public class Doctor {
 
     @Id
     @Column(name = "user_id", nullable = false)
+    @NonNull
     private UUID userId;
 
     @Column(name = "speciality", nullable = false)

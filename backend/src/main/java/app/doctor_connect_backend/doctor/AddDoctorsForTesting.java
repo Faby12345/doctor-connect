@@ -1,17 +1,16 @@
 package app.doctor_connect_backend.doctor;
 
-import app.doctor_connect_backend.auth.app.AuthService;   // <-- adjust if register(...) lives elsewhere
-  // <-- adjust to where UserResponse lives
+import app.doctor_connect_backend.auth.app.AuthService; // <-- adjust if register(...) lives elsewhere
+// <-- adjust to where UserResponse lives
 
-import app.doctor_connect_backend.auth.web.DTOs.UserResponse;
+import app.doctor_connect_backend.auth.web.DTOs.AuthResponse;
 import app.doctor_connect_backend.user.Roles;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
@@ -19,33 +18,35 @@ import java.util.UUID;
 public class AddDoctorsForTesting {
 
     private final AuthService authService;
-    private final doctorRepository doctorRepository; // rename if your repo class name differs
+    private final DoctorRepository doctorRepository;
     private final Random random = new Random();
 
-    public AddDoctorsForTesting(AuthService authService, doctorRepository doctorRepository) {
+    public AddDoctorsForTesting(AuthService authService, DoctorRepository doctorRepository) {
         this.authService = authService;
         this.doctorRepository = doctorRepository;
     }
 
-    /** Seeds 50 doctors by creating a DOCTOR user first, then updating Doctor profile fields. */
+    /**
+     * Seeds 50 doctors by creating a DOCTOR user first, then updating Doctor
+     * profile fields.
+     */
     public void addDoctors() {
         List<String> specialties = List.of(
                 "Cardiology", "Dermatology", "Pediatrics", "Orthopedics", "Psychiatry",
-                "Neurology", "Oncology", "Endocrinology", "Radiology", "Ophthalmology"
-        );
+                "Neurology", "Oncology", "Endocrinology", "Radiology", "Ophthalmology");
 
         List<String> cities = List.of(
                 "Bucharest", "Cluj", "Iasi", "Timisoara", "Constanta",
-                "Brasov", "Sibiu", "Oradea", "Pitesti", "Craiova"
-        );
+                "Brasov", "Sibiu", "Oradea", "Pitesti", "Craiova");
 
         for (int i = 1; i <= 50; i++) {
             String fullName = "Dr. Test " + i;
-            String email = "doctor" + i + "@example.com";   // must be unique
+            String email = "doctor" + i + "@example.com"; // must be unique
             String password = "P@ssw0rd!" + i;
 
-            // 1) Create the user (role = DOCTOR). Your register(...) already inserts a Doctor row with that user_id
-            UserResponse savedUser = authService.register(fullName, email, password, Roles.DOCTOR);
+            // 1) Create the user (role = DOCTOR). Your register(...) already inserts a
+            // Doctor row with that user_id
+            AuthResponse savedUser = authService.register(fullName, email, password, Roles.DOCTOR);
             UUID userId = savedUser.id();
 
             // 2) Find the just-created Doctor by FK (user_id)
@@ -53,7 +54,7 @@ public class AddDoctorsForTesting {
             if (doctor == null) {
                 // fallback: if your register does NOT auto-create a Doctor, create it now
                 doctor = new Doctor();
-                doctor.setUserId(userId);
+                doctor.setUserId(Objects.requireNonNull(userId));
             }
 
             // 3) Fill realistic random data for the doctor profile
